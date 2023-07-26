@@ -15,9 +15,14 @@ public class UserDaoHibernateImpl implements UserDao {
     public void createUsersTable() {
         try (Session session = factory.getCurrentSession();) {
             session.beginTransaction();
-            session.createSQLQuery("CREATE TABLE IF NOT EXISTS User (id INT PRIMARY KEY AUTO_INCREMENT," +
-                    " name VARCHAR(45), lastname VARCHAR(45), age INT)").executeUpdate();
-            session.getTransaction().commit();
+            try {
+                session.createSQLQuery("CREATE TABLE IF NOT EXISTS User (id INT PRIMARY KEY AUTO_INCREMENT," +
+                        " name VARCHAR(45), lastname VARCHAR(45), age INT)").executeUpdate();
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.beginTransaction().rollback();
+                throw e;
+            }
         }
     }
 
@@ -25,8 +30,14 @@ public class UserDaoHibernateImpl implements UserDao {
     public void dropUsersTable() {
         try (Session session = factory.getCurrentSession();) {
             session.beginTransaction();
-            session.createSQLQuery("DROP TABLE IF EXISTS User").executeUpdate();
-            session.getTransaction().commit();
+            try {
+                session.createSQLQuery("DROP TABLE IF EXISTS User").executeUpdate();
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.beginTransaction().rollback();
+                throw e;
+            }
+
         }
     }
 
@@ -34,9 +45,14 @@ public class UserDaoHibernateImpl implements UserDao {
     public void saveUser(String name, String lastName, byte age) {
         try (Session session = factory.getCurrentSession();) {
             session.beginTransaction();
-            User user = new User(name, lastName, age);
-            session.saveOrUpdate(user);
-            session.getTransaction().commit();
+            try {
+                User user = new User(name, lastName, age);
+                session.saveOrUpdate(user);
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.beginTransaction().rollback();
+                throw e;
+            }
         }
     }
 
@@ -44,9 +60,14 @@ public class UserDaoHibernateImpl implements UserDao {
     public void removeUserById(long id) {
         try (Session session = factory.getCurrentSession();) {
             session.beginTransaction();
-            User user = session.get(User.class, id);
-            session.delete(user);
-            session.getTransaction().commit();
+            try {
+                User user = session.get(User.class, id);
+                session.delete(user);
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.beginTransaction().rollback();
+                throw e;
+            }
         }
     }
 
@@ -55,8 +76,13 @@ public class UserDaoHibernateImpl implements UserDao {
         List<User> user = new ArrayList<>();
         try (Session session = factory.getCurrentSession()) {
             session.beginTransaction();
-            user = session.createQuery("from User").getResultList();
-            session.getTransaction().commit();
+            try {
+                user = session.createQuery("from User").getResultList();
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.beginTransaction().rollback();
+                throw e;
+            }
             return user;
         }
     }
@@ -65,8 +91,13 @@ public class UserDaoHibernateImpl implements UserDao {
     public void cleanUsersTable() {
         try (Session session = factory.getCurrentSession();) {
             session.beginTransaction();
-            session.createQuery("delete User").executeUpdate();
-            session.getTransaction().commit();
+            try {
+                session.createQuery("delete User").executeUpdate();
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                session.beginTransaction().rollback();
+                throw e;
+            }
         }
     }
 }
